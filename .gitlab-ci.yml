@@ -8,9 +8,6 @@ before_script:
   - mkdir $GOPATH/src/exporter/
   - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/exporter/
   - cd $GOPATH/src/exporter/
-  - go get github.com/cpuguy83/go-md2man/md2man@1.0.10
-  #- go get -u github.com/golang/dep/cmd/dep
-  #- dep init
 
 unit_tests:
   stage: test
