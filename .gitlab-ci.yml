@@ -6,6 +6,7 @@ stages:
 
 before_script:
   - echo "starting CI pipeline"
+  - dep init
 
 unit_tests:
   stage: test
