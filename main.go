@@ -22,14 +22,15 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 
 		}
 		go func() {
-			var date = time.Now().Add(-240).Format(time.RFC3339)
 			for {
+				var date = time.Now().Add(time.Duration(-4) * time.Minute).Format(time.RFC3339)
 				resp, err := getCloudflareCacheMetrics(buildGraphQLQuery(date), conf.apiEmail, conf.apiKey)
 
 				if err == nil {
 					for _, node := range resp.Viewer.Zones[0].HTTPRequestsCacheGroups {
 						requestBytes.With(prometheus.Labels{"cacheStatus": node.Dimensions.CacheStatus}).Set(float64(node.Sum.EdgeResponseBytes))
 					}
+					log.Println("Fetch done at: ", date)
 					fetchDone.Inc()
 				} else {
 					log.Println("Fetch failed: ", err)

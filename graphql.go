@@ -34,7 +34,7 @@ func buildGraphQLQuery(date string) *graphql.Request {
 		  zones(filter: { zoneTag: $zoneTag }) {
 			httpRequestsCacheGroups(
 			  limit: 10000
-			  filter: { datetimeMinute_gt: $lastSuccessfulScrape }
+			  filter: { datetime_gt: $lastSuccessfulScrape }
 			) {
 			  dimensions {
 				cacheStatus
