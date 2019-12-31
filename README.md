@@ -1,8 +1,8 @@
 # Cloudflare prometheus exporter
 
-Cloudflare prometheus exporter provide direct support for Cloudflare metrics to be published in Prometheus.
+Cloudflare prometheus exporter provides direct support for Cloudflare metrics to be exposed to Prometheus.
 
-This library uses Cloudflare's GraphQL endpoint to fetch the aggregated metrics for a given zone/user (future).
+This library uses Cloudflare's GraphQL endpoint to fetch the aggregated metrics for a given zone/user(future).
 
 ### Prometheus metrics
 
@@ -78,6 +78,8 @@ cloudflare-prometheus-exporter <options>
 ```
 
 ## Docker machine
+
+The Docker machine is publicly available on docker.io's registry at this address: https://hub.docker.com/repository/docker/stephanecloudflare/cloudflare-prometheus-exporter
 
 ```
 docker run stephanecloudflare/cloudflare-prometheus-exporter -p 2112:2112 -e APIKEY=YOUR-KEY
