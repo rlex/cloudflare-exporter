@@ -4,9 +4,18 @@ Cloudflare prometheus exporter provide direct support for Cloudflare metrics to 
 
 This library uses Cloudflare's GraphQL endpoint to fetch the aggregated metrics for a given zone/user (future).
 
-### Supported metrics
+### Prometheus metrics
+
+## Supported metrics
 
 - Caching (cached, uncached)
+
+## Format
+
+Here is a sample of metric you should get once running and fetching from the API
+
+`
+
 
 ## Usage
 
@@ -39,6 +48,12 @@ The interval of check is set to 1 minute, during which the service will stay sta
 go get -u gitlab.com/stephane5/cloudflare-prometheus-exporter
 ```
 
+Once installed, call it as you would call any other GO binary 
+
+```
+cloudflare-prometheus-exporter <options>
+```
+
 ## Docker machine
 
 ```
@@ -46,4 +61,4 @@ docker run stephanecloudflare/cloudflare-prometheus-exporter -p 2112:2112 -e API
 5092dbe60 -e APIEMAIL=YOUR-EMAIL
 ```
 
-Note: the exposed port could be the one you wish to use externally but the service itself should be kept on 2112 TCP (default port hard coded in the script)
+**Note**: the exposed port could be the one you wish to use externally but the service itself should be kept on 2112 TCP (default port hard coded in the script)
