@@ -8,8 +8,6 @@ before_script:
   - mkdir $GOPATH/src/exporter/
   - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/exporter/
   - cd $GOPATH/src/exporter/
-  - echo $APIKEY
-  - echo $APIEMAIL
 
 unit_tests:
   stage: test
