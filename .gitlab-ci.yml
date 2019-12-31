@@ -6,6 +6,7 @@ stages:
 
 before_script:
   - echo "starting CI pipeline"
+  - go get -u github.com/golang/dep/cmd/dep
   - dep init
 
 unit_tests:
