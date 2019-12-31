@@ -22,11 +22,7 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 
 		}
 		go func() {
-<<<<<<< HEAD
 			var date = time.Now().Add(-240).Format(time.RFC3339)
-=======
-			var date = time.Now().AddDate(0, -4, 0).Format(time.RFC3339)
->>>>>>> 7bed218a9c002d9fb00a2ccffd0870f93eac3b45
 			for {
 				resp, err := getCloudflareCacheMetrics(buildGraphQLQuery(date), conf.apiEmail, conf.apiKey)
 
