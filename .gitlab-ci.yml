@@ -8,9 +8,9 @@ before_script:
   - mkdir $GOPATH/src/exporter/
   - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/exporter/
   - cd $GOPATH/src/exporter/
-  - go get -u github.com/prometheus/client_golang/prometheus
-  - go get -u github.com/urfave/cli
-  - go get -u github.com/machinebox/graphql
+  - go get github.com/prometheus/client_golang/prometheus
+  - go get github.com/urfave/cli
+  - go get github.com/machinebox/graphql
   - ls
   - go version
   #- go get -u github.com/golang/dep/cmd/dep
