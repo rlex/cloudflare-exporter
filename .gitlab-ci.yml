@@ -6,7 +6,8 @@ stages:
 
 before_script:
   - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/exporter
-  - cd $GOPATH/src/exporter
+  - mkdir $GOPATH/src/exporter/
+  - cd $GOPATH/src/exporter/
   - go get -u github.com/golang/dep/cmd/dep
   - dep init
 
