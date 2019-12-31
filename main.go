@@ -22,10 +22,8 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 
 		}
 		go func() {
-			var date = time.Now().Format(time.RFC3339)
+			var date = time.Now().AddDate(0, -4, 0).Format(time.RFC3339)
 			for {
-				time.Sleep(60 * time.Second)
-
 				resp, err := getCloudflareCacheMetrics(buildGraphQLQuery(date), conf.apiEmail, conf.apiKey)
 
 				if err == nil {
@@ -37,6 +35,7 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 					log.Println("Fetch failed: ", err)
 					fetchFailed.Inc()
 				}
+				time.Sleep(240 * time.Second)
 			}
 		}()
 		return nil
