@@ -1,0 +1,26 @@
+image: golang:1.9
+
+cache:
+  paths:
+    - /apt-cache
+    - /go/src/github.com
+    - /go/src/golang.org
+    - /go/src/google.golang.org
+    - /go/src/gopkg.in
+
+stages:
+  - test
+  - build
+
+before_script:
+  - pwd
+
+unit_tests:
+  stage: test
+  script:
+    - ls
+
+build:
+  stage: build
+  script:
+    - go build *.go
