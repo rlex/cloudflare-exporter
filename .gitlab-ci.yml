@@ -5,7 +5,8 @@ stages:
   - build
 
 before_script:
-  - echo "starting CI pipeline"
+  - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/exporter
+  - cd $GOPATH/src/exporter
   - go get -u github.com/golang/dep/cmd/dep
   - dep init
 
