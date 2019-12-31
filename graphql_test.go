@@ -8,7 +8,7 @@ import (
 
 func TestMetrics(t *testing.T) {
 	date := time.Now().Format(time.RFC3339)
-	_, err := getCloudflareCacheMetrics(buildGraphQLQuery(date), os.Getenv("apiEmail"), os.Getenv("apiKey"))
+	_, err := getCloudflareCacheMetrics(buildGraphQLQuery(date), os.Getenv("APIEMAIL"), os.Getenv("APIKEY"))
 	if err != nil {
 		t.Errorf("Error: %v", err)
 	} else {
