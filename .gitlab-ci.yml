@@ -10,6 +10,7 @@ before_script:
   - cd $GOPATH/src/exporter/
   - go get -u github.com/golang/dep/cmd/dep
   - dep init
+  - rm -rf vendor/github.com/cpuguy83/go-md2man/md2man/
 
 unit_tests:
   stage: test
