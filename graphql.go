@@ -26,7 +26,7 @@ type Viewer struct {
 	Zones []Zones `json:"zones"`
 }
 
-func buildGraphQLQuery(date string) *graphql.Request {
+func buildGraphQLQuery(date string, zoneID string) *graphql.Request {
 
 	queryForCache := graphql.NewRequest(`
 	{
@@ -50,7 +50,7 @@ func buildGraphQLQuery(date string) *graphql.Request {
 	`)
 
 	// set any variables
-	queryForCache.Var("zoneTag", "d88b6d7f404e420305cd6c9a73c60576")
+	queryForCache.Var("zoneTag", zoneID)
 	queryForCache.Var("lastSuccessfulScrape", date)
 
 	return queryForCache

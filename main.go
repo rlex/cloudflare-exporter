@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cloudflare/cloudflare-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -23,18 +24,36 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 		}
 		go func() {
 			for {
-				var date = time.Now().Add(time.Duration(-4) * time.Minute).Format(time.RFC3339)
-				resp, err := getCloudflareCacheMetrics(buildGraphQLQuery(date), conf.apiEmail, conf.apiKey)
 
-				if err == nil {
-					for _, node := range resp.Viewer.Zones[0].HTTPRequestsCacheGroups {
-						requestBytes.With(prometheus.Labels{"cacheStatus": node.Dimensions.CacheStatus}).Set(float64(node.Sum.EdgeResponseBytes))
+				var date = time.Now().Add(time.Duration(-4) * time.Minute).Format(time.RFC3339)
+
+				// Construct a new API object
+				api, err := cloudflare.New(conf.apiKey, conf.apiEmail)
+				if err != nil {
+					log.Println(err)
+				}
+				zones, err := api.ListZones()
+				if err != nil {
+					log.Println("Listing zone errored: ", err)
+				}
+				for _, zone := range zones {
+
+					if zone.Plan.ZonePlanCommon.Name == "Enterprise Website" {
+						log.Println(zone.Name)
+						resp, err := getCloudflareCacheMetrics(buildGraphQLQuery(date, zone.ID), conf.apiEmail, conf.apiKey)
+
+						if err == nil {
+							for _, node := range resp.Viewer.Zones[0].HTTPRequestsCacheGroups {
+								requestBytes.With(prometheus.Labels{"cacheStatus": node.Dimensions.CacheStatus, "zoneName": zone.Name}).Set(float64(node.Sum.EdgeResponseBytes))
+							}
+							log.Println("Fetch done at:", date)
+							fetchDone.Inc()
+						} else {
+							log.Println("Fetch failed :", err)
+							fetchFailed.Inc()
+						}
 					}
-					log.Println("Fetch done at: ", date)
-					fetchDone.Inc()
-				} else {
-					log.Println("Fetch failed: ", err)
-					fetchFailed.Inc()
+
 				}
 				time.Sleep(240 * time.Second)
 			}
@@ -56,7 +75,7 @@ var (
 		Name: "cloudflare_processed_bytes",
 		Help: "The total number of processed bytes, labelled per cache status",
 	},
-		[]string{"cacheStatus"},
+		[]string{"cacheStatus", "zoneName"},
 	)
 )
 
@@ -72,11 +91,15 @@ func main() {
 
 	conf := &config{}
 	app.Action = recordMetrics(conf)
+
 	if err := app.Run(os.Args); err != nil {
 		log.Println(err)
 	}
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":2112", nil)
+	err := http.ListenAndServe(":2112", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 var flags = []cli.Flag{
