@@ -26,6 +26,10 @@
 
 
 [[constraint]]
+  name = "github.com/cloudflare/cloudflare-go"
+  version = "0.11.0"
+
+[[constraint]]
   name = "github.com/machinebox/graphql"
   version = "0.2.2"
 

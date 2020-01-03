@@ -82,8 +82,7 @@ cloudflare-prometheus-exporter <options>
 The Docker machine is publicly available on docker.io's registry at this address: https://hub.docker.com/repository/docker/stephanecloudflare/cloudflare-prometheus-exporter
 
 ```
-docker run stephanecloudflare/cloudflare-prometheus-exporter -p 2112:2112 -e APIKEY=YOUR-KEY
-5092dbe60 -e APIEMAIL=YOUR-EMAIL
+docker run stephanecloudflare/cloudflare-prometheus-exporter -p 2112:2112 -e APIKEY=YOUR-KEY -e APIEMAIL=YOUR-EMAIL
 ```
 
 **Note**: the exposed port could be the one you wish to use externally but the service itself should be kept on 2112 TCP (default port hard coded in the script)
