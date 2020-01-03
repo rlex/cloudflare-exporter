@@ -2,17 +2,17 @@
 
 # Cloudflare prometheus exporter
 
-Cloudflare prometheus exporter provides direct support for Cloudflare metrics to be exposed to Prometheus.
+Cloudflare prometheus exporter helps you to expose your Cloudflare metrics to Prometheus.
 
-This library uses Cloudflare's GraphQL endpoint to fetch the aggregated metrics for a given zone/user(future).
+This library uses Cloudflare's GraphQL endpoint to fetch the aggregated metrics for any zones linked to the account used by the service.
 
-### Prometheus metrics
+## Prometheus metrics
 
-## Supported metrics
+### Supported metrics
 
 - Caching (cached, uncached)
 
-## Format
+### Format
 
 Here are the exposed metrics
 
@@ -23,21 +23,26 @@ Here are the exposed metrics
 Here is a sample of metric you should get once running and fetching from the API
 
 ```
-# HELP cloudflare_done_fetches The total number of done fetches
 # TYPE cloudflare_done_fetches counter
-cloudflare_done_fetches 1
+cloudflare_done_fetches 547
 # HELP cloudflare_failed_fetches The total number of failed fetches
 # TYPE cloudflare_failed_fetches counter
 cloudflare_failed_fetches 0
 # HELP cloudflare_processed_bytes The total number of processed bytes, labelled per cache status
 # TYPE cloudflare_processed_bytes gauge
-cloudflare_processed_bytes{cacheStatus="dynamic"} 7662
-cloudflare_processed_bytes{cacheStatus="hit"} 72128
+cloudflare_processed_bytes{cacheStatus="dynamic",zoneName="azerty"} 5549
+cloudflare_processed_bytes{cacheStatus="dynamic",zoneName="foobar"} 3853
+cloudflare_processed_bytes{cacheStatus="dynamic",zoneName="blabla"} 5534
+cloudflare_processed_bytes{cacheStatus="expired",zoneName="foobar"} 86728
 ```
 
-Cache metrics are indexed with the cacheStatus as a label, so you can group by cacheStatus in your visualizations.
+Cache metrics are indexed with the cacheStatus and zoneName as labels, so you can group by cacheStatus in your visualizations like the following
 
-## Usage
+```
+sum(cloudflare_processed_bytes{zoneName="justalittlebyte.ovh"})by(cacheStatus)
+```
+
+### Usage
 
 ```
 NAME:
@@ -67,7 +72,7 @@ TODO:
 - Argument to set frequency
 - Auto-adapt frequency based on the volume of aggregated metrics
 
-## Installation
+### Installation
 
 ```
 go get -u gitlab.com/stephane5/cloudflare-prometheus-exporter
@@ -79,7 +84,7 @@ Once installed, call it as you would call any other GO binary
 cloudflare-prometheus-exporter <options>
 ```
 
-## Docker machine
+### Docker machine
 
 The Docker machine is publicly available on docker.io's registry at this address: https://hub.docker.com/repository/docker/stephanecloudflare/cloudflare-prometheus-exporter
 
@@ -89,7 +94,7 @@ docker run stephanecloudflare/cloudflare-prometheus-exporter -p 2112:2112 -e API
 
 **Note**: the exposed port could be the one you wish to use externally but the service itself should be kept on 2112 TCP (default port hard coded in the script)
 
-## Support
+### Support
 
 The project is a personal project and hence Cloudflare support isn't going to be able to provide support for it, please submit your requests directly toward the issue section of this repository.
 
