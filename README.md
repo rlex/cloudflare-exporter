@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/gitlab.com/stephane5/cloudflare-prometheus-exporter)](https://goreportcard.com/report/gitlab.com/stephane5/cloudflare-prometheus-exporter)
+
 # Cloudflare prometheus exporter
 
 Cloudflare prometheus exporter provides direct support for Cloudflare metrics to be exposed to Prometheus.
