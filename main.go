@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/cloudflare/cloudflare-go"
@@ -37,14 +38,16 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 					log.Println("Listing zone errored: ", err)
 				}
 				for _, zone := range zones {
-
 					if zone.Plan.ZonePlanCommon.Name == "Enterprise Website" {
 						log.Println(zone.Name)
 						resp, err := getCloudflareCacheMetrics(buildGraphQLQuery(date, zone.ID), conf.apiEmail, conf.apiKey)
 
 						if err == nil {
-							for _, node := range resp.Viewer.Zones[0].HTTPRequestsCacheGroups {
-								requestBytes.With(prometheus.Labels{"cacheStatus": node.Dimensions.CacheStatus, "zoneName": zone.Name}).Set(float64(node.Sum.EdgeResponseBytes))
+							for _, node := range resp.Viewer.Zones[0].Caching{
+								requestBytes.With(prometheus.Labels{"cacheStatus": node.Dimensions.CacheStatus, "zoneName": zone.Name}).Set(float64(node.SumEdgeResponseBytes.EdgeResponseBytes))
+							}
+							for _, node := range resp.Viewer.Zones[0].ResponseCodes{
+								requestResponseCodes.With(prometheus.Labels{"responseCode": strconv.Itoa(node.SumResponseStatus.ResponseStatusMap[0].EdgeResponseStatus), "zoneName": zone.Name}).Set(float64(node.SumResponseStatus.ResponseStatusMap[0].Requests))
 							}
 							log.Println("Fetch done at:", date)
 							fetchDone.Inc()
@@ -76,6 +79,12 @@ var (
 		Help: "The total number of processed bytes, labelled per cache status",
 	},
 		[]string{"cacheStatus", "zoneName"},
+	)
+	requestResponseCodes = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "cloudflare_requests_per_response_code",
+		Help: "The total number of request, labelled per HTTP response codes",
+	},
+		[]string{"responseCode", "zoneName"},
 	)
 )
 
