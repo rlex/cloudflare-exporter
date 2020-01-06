@@ -11,6 +11,7 @@ This library uses Cloudflare's GraphQL endpoint to fetch the aggregated metrics 
 ### Supported metrics
 
 - Caching (cached, uncached)
+- HTTP Response Codes 
 
 ### Format
 
@@ -18,7 +19,8 @@ Here are the exposed metrics
 
 - **cloudflare_done_fetches**: Number of fetchs effectively successfully sent towards the API 
 - **cloudflare_failed_fetches**: Number of fetchs having failed
-- **cloudflare_processed_bytes{*cacheStatus*}**: Number of bytes per *cacheStatus*
+- **cloudflare_processed_bytes{*cacheStatus*, *zoneName*}**: Number of bytes per *cacheStatus* and *zoneName*
+- **cloudflare_requests_per_response_code{*responseCode*, *zoneName*}**: Number of request per *responseCode* and *zoneName*
 
 Here is a sample of metric you should get once running and fetching from the API
 
@@ -34,6 +36,12 @@ cloudflare_processed_bytes{cacheStatus="dynamic",zoneName="azerty"} 5549
 cloudflare_processed_bytes{cacheStatus="dynamic",zoneName="foobar"} 3853
 cloudflare_processed_bytes{cacheStatus="dynamic",zoneName="blabla"} 5534
 cloudflare_processed_bytes{cacheStatus="expired",zoneName="foobar"} 86728
+# HELP cloudflare_requests_per_response_code The total number of request, labelled per HTTP response codes
+# TYPE cloudflare_requests_per_response_code gauge
+cloudflare_requests_per_response_code{responseCode="200",zoneName="azerty"} 121
+cloudflare_requests_per_response_code{responseCode="200",zoneName="foobar"} 6
+cloudflare_requests_per_response_code{responseCode="200",zoneName="blabla"} 10
+cloudflare_requests_per_response_code{responseCode="301",zoneName="azerty"} 1
 ```
 
 Cache metrics are indexed with the cacheStatus and zoneName as labels, so you can group by cacheStatus in your visualizations like the following
