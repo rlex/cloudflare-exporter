@@ -12,15 +12,26 @@ type respDataStruct struct {
 type Dimensions struct {
 	CacheStatus string `json:"cacheStatus"`
 }
-type Sum struct {
+type SumEdgeResponseBytes struct {
 	EdgeResponseBytes int `json:"edgeResponseBytes"`
 }
-type HTTPRequestsCacheGroups struct {
-	Dimensions Dimensions `json:"dimensions"`
-	Sum        Sum        `json:"sum"`
+type Caching struct {
+	Dimensions           Dimensions           `json:"dimensions"`
+	SumEdgeResponseBytes SumEdgeResponseBytes `json:"sumEdgeResponseBytes"`
+}
+type ResponseStatusMap struct {
+	EdgeResponseStatus int `json:"edgeResponseStatus"`
+	Requests           int `json:"requests"`
+}
+type SumResponseStatus struct {
+	ResponseStatusMap []ResponseStatusMap `json:"responseStatusMap"`
+}
+type ResponseCodes struct {
+	SumResponseStatus SumResponseStatus `json:"sumResponseStatus"`
 }
 type Zones struct {
-	HTTPRequestsCacheGroups []HTTPRequestsCacheGroups `json:"httpRequestsCacheGroups"`
+	Caching       []Caching       `json:"caching"`
+	ResponseCodes []ResponseCodes `json:"responseCodes"`
 }
 type Viewer struct {
 	Zones []Zones `json:"zones"`
@@ -32,22 +43,30 @@ func buildGraphQLQuery(date string, zoneID string) *graphql.Request {
 	{
 		viewer {
 		  zones(filter: { zoneTag: $zoneTag }) {
-			httpRequestsCacheGroups(
+			caching:httpRequestsCacheGroups(
 			  limit: 10000
-			  filter: { datetime_gt: $lastSuccessfulScrape }
+			  filter: { datetime_gt: $lastSuccessfulScrape}
 			) {
 			  dimensions {
 				cacheStatus
 			  }
-			  sum {
+			  SumEdgeResponseBytes:sum {
 				edgeResponseBytes
+			  }
+			}
+		   responseCodes:httpRequests1mGroups(limit: 10000
+			  filter: { datetime_gt: $lastSuccessfulScrape }) {
+				SumResponseStatus:sum{
+				responseStatusMap{
+				  edgeResponseStatus
+				  requests
+				}
 			  }
 			}
 		  }
 		}
 	  }
-	  
-	`)
+	  `)
 
 	// set any variables
 	queryForCache.Var("zoneTag", zoneID)
