@@ -10,7 +10,7 @@ This library uses Cloudflare's GraphQL endpoint to fetch the aggregated metrics 
 
 ### Supported metrics
 
-- Caching (cached, uncached)
+- Request Bytes
 - HTTP Response Codes 
 
 ### Format
