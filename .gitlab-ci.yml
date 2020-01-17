@@ -4,13 +4,14 @@ stages:
   - test
   - build
   - docker
-
-test:
-  stage: test
-  before_script:
+  
+before_script:
   - mkdir $GOPATH/src/exporter/
   - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/exporter/
   - cd $GOPATH/src/exporter/
+
+test:
+  stage: test
   script:
     - go test
 
@@ -23,12 +24,7 @@ build:
     
 docker:
   stage: docker
-  dependencies:
-    - test
-    - build
   image: docker
   script:
     - docker build -t registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest .
     - docker push registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest
-    
-    
