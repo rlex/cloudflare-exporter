@@ -18,3 +18,5 @@ build:
   stage: build
   script:
     - go build *.go
+    - docker build -t registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest .
+    - docker push registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest
