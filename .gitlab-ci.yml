@@ -3,20 +3,33 @@ image: golang:1.13
 stages:
   - test
   - build
+  - docker
 
 before_script:
   - mkdir $GOPATH/src/exporter/
   - cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/exporter/
   - cd $GOPATH/src/exporter/
 
-unit_tests:
+test:
   stage: test
   script:
     - go test
 
 build:
   stage: build
+  dependencies:
+    - test
   script:
     - go build *.go
+    
+docker:
+  stage: docker
+  dependencies:
+    - test
+    - build
+  image: docker
+  script:
     - docker build -t registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest .
     - docker push registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest
+    
+    
