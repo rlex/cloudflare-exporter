@@ -31,9 +31,10 @@ build:
     
 docker:
   stage: docker
-  image: docker
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  image: docker:stable
+  services:
+    - docker:dind
   script:
-    - docker build -t registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest .
-    - docker push registry.gitlab.com/stephane5/cloudflare-prometheus-exporter:latest
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/stephane5/cloudflare-prometheus-exporter:latest .
+    - docker push $CI_REGISTRY/stephane5/cloudflare-prometheus-exporter:latest
