@@ -165,11 +165,11 @@ func main() {
 }
 
 var flags = []cli.Flag{
-	cli.StringFlag{
+	&cli.StringFlag{
 		Name:  "api-key",
 		Usage: "Your Cloudflare API token",
 	},
-	cli.StringFlag{
+	&cli.StringFlag{
 		Name:  "api-email",
 		Usage: "The email address associated with your Cloudflare API token and account",
 	},
