@@ -43,12 +43,35 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 						resp, err := getCloudflareCacheMetrics(buildGraphQLQuery(date, zone.ID), conf.apiEmail, conf.apiKey)
 
 						if err == nil {
+                            log.Printf("%+v\n", resp)
 							for _, node := range resp.Viewer.Zones[0].Caching{
-								requestBytes.With(prometheus.Labels{"cacheStatus": node.Dimensions.CacheStatus, "zoneName": zone.Name}).Set(float64(node.SumEdgeResponseBytes.EdgeResponseBytes))
+								requestBytes.With(prometheus.Labels{
+									"zone_name": zone.Name, "cache_status": node.Dimensions.CacheStatus}).Set(float64(node.SumEdgeResponseBytes.EdgeResponseBytes))
 							}
 							for _, node := range resp.Viewer.Zones[0].ResponseCodes{
-								requestResponseCodes.With(prometheus.Labels{"responseCode": strconv.Itoa(node.SumResponseStatus.ResponseStatusMap[0].EdgeResponseStatus), "zoneName": zone.Name}).Set(float64(node.SumResponseStatus.ResponseStatusMap[0].Requests))
+								requestResponseCodes.With(prometheus.Labels{
+									"zone_name": zone.Name, "response_code": strconv.Itoa(node.SumResponseStatus.ResponseStatusMap[0].EdgeResponseStatus)}).Set(float64(node.SumResponseStatus.ResponseStatusMap[0].Requests))
 							}
+							for _, node := range resp.Viewer.Zones[0].FirewallEvents {
+								requestFirewallEvents.With(prometheus.Labels{
+									"zone_name": zone.Name, "action": node.Dimensions.Action, "client_country_name": node.Dimensions.ClientCountryName, "client_ip": node.Dimensions.ClientIP, "rule_id": node.Dimensions.RuleID}).Set(float64(node.Count))
+							}
+							for _, node := range resp.Viewer.Zones[0].LoadBalancerEvents{
+								requestLoadBalancerEvents.With(prometheus.Labels{
+									"zone_name": zone.Name, "colo_code": node.Dimensions.ColoCode, "selected_origin_name": node.Dimensions.SelectedOriginName, "lb_name": node.Dimensions.LBName}).Set(float64(node.Count))
+							}
+							for _, node := range resp.Viewer.Zones[0].RequestsByColo{
+								requestRequestsByColo.With(prometheus.Labels{
+									"zone_name": zone.Name, "colo_code": node.Dimensions.ColoCode}).Set(float64(node.Sum.Requests))
+							}
+//							for _, node := range resp.Viewer.Zones[0].CacheRequests {
+//								requestCacheRequests_c.With(prometheus.Labels{
+//									"zone_name": zone.Name}).Set(float64(node.SumResponseStatus.CachedRequests))
+//							}
+//							for _, node := range resp.Viewer.Zones[0].CacheRequests{
+//								requestCacheRequests_u.With(prometheus.Labels{
+//									"zone_name": zone.Name}).Set(float64(node.SumResponseStatus.Requests))
+//							}
 							log.Println("Fetch done at:", date)
 							fetchDone.Inc()
 						} else {
@@ -78,14 +101,44 @@ var (
 		Name: "cloudflare_processed_bytes",
 		Help: "The total number of processed bytes, labelled per cache status",
 	},
-		[]string{"cacheStatus", "zoneName"},
+		[]string{"cache_status", "zone_name"},
 	)
 	requestResponseCodes = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "cloudflare_requests_per_response_code",
 		Help: "The total number of request, labelled per HTTP response codes",
 	},
-		[]string{"responseCode", "zoneName"},
+		[]string{"response_code", "zone_name"},
 	)
+	requestFirewallEvents = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "cloudflare_firewall_events",
+		Help: "WAF events",
+	},
+		[]string{"action", "zone_name", "client_country_name", "client_ip", "rule_id"},
+	)
+	requestLoadBalancerEvents = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "cloudflare_loadbalancer_events",
+		Help: "WAF events",
+	},
+		[]string{"colo_code", "zone_name", "selected_origin_name", "lb_name"},
+	)
+	requestRequestsByColo = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "cloudflare_requests_by_colo",
+		Help: "The total number of processed requests, labelled per point of presence",
+	},
+		[]string{"colo_code", "zone_name"},
+	)
+//	requestCacheRequests_c = promauto.NewGaugeVec(prometheus.GaugeOpts{
+//		Name: "cloudflare_requests_cached",
+//		Help: "The total number of processed requests, labelled per point of presence",
+//	},
+//		[]string{"zonename"},
+//	)
+//	requestCacheRequests_u = promauto.NewGaugeVec(prometheus.GaugeOpts{
+//		Name: "cloudflare_requests_not_cached",
+//		Help: "The total number of processed requests, labelled per point of presence",
+//	},
+//		[]string{"zonename"},
+//	)
 )
 
 func main() {
