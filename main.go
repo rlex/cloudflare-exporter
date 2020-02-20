@@ -81,7 +81,7 @@ func recordMetrics(conf *config) func(c *cli.Context) error {
 					}
 
 				}
-				time.Sleep(240 * time.Second)
+				time.Sleep(30 * time.Second)
 			}
 		}()
 		return nil
